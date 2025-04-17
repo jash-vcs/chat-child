@@ -202,7 +202,7 @@ export default function StatusSidebar({ className }: StatusSidebarProps) {
 
   return (
     <div className={cn("flex flex-col h-full", className)}>
-      <div className="p-4 border-b border-border">
+      <div className="p-4 py-5 border-b border-border">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold">Chat Tree</h2>
           <ThemeToggle />

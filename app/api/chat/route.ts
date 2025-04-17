@@ -34,7 +34,10 @@ export async function POST(req: NextRequest) {
     // Create chat instance
     const chat = ai.chats.create({
       model: config.model,
-      temperature: config.temperature || 0.7,
+      config: {
+        temperature: config.temperature || 0.7,
+        systemInstruction: config.systemInstruction,
+      },
       history: history,
     });
     
@@ -43,7 +46,7 @@ export async function POST(req: NextRequest) {
       message: latestMessage.content,
     });
     
-    return NextResponse.json({ response: response.text() });
+    return NextResponse.json({ response: response.text });
   } catch (error) {
     console.error('Error in chat API:', error);
     return NextResponse.json({ error: 'Failed to process chat request' }, { status: 500 });

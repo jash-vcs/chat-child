@@ -171,7 +171,7 @@ export default function ChatArea({ className }: ChatAreaProps) {
       <div className="flex items-center justify-between p-4 border-b border-border">
         <h2 className="text-xl font-bold truncate">{activeSession.agentConfig.name}</h2>
         <div className="flex space-x-2">
-          <ThemeToggleSimple />
+          {/* <ThemeToggleSimple /> */}
           <Button variant="outline" size="icon" onClick={handleSplitChat} title="Split Chat">
             <Split className="h-4 w-4" />
           </Button>
