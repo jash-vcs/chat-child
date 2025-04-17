@@ -10,6 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Settings, Split, Send, GitBranch } from "lucide-react"
 import ChatMessage from "@/components/chat-message"
 import AgentConfigModal from "@/components/agent-config-modal"
+import { ThemeToggleSimple } from "@/components/theme-toggle"
 
 type ChatAreaProps = {
   className?: string
@@ -167,9 +168,10 @@ export default function ChatArea({ className }: ChatAreaProps) {
 
   return (
     <div className={cn("flex flex-col h-full", className)}>
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800">
+      <div className="flex items-center justify-between p-4 border-b border-border">
         <h2 className="text-xl font-bold truncate">{activeSession.agentConfig.name}</h2>
         <div className="flex space-x-2">
+          <ThemeToggleSimple />
           <Button variant="outline" size="icon" onClick={handleSplitChat} title="Split Chat">
             <Split className="h-4 w-4" />
           </Button>
@@ -196,7 +198,7 @@ export default function ChatArea({ className }: ChatAreaProps) {
         </div>
       </ScrollArea>
 
-      <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+      <div className="p-4 border-t border-border">
         <form onSubmit={handleSubmit} className="flex space-x-2">
           <Input
             value={input}

@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils"
 import { Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useEffect, useRef } from "react"
+import { ThemeToggle } from "@/components/theme-toggle"
+import { useTheme } from "next-themes"
 
 type StatusSidebarProps = {
   className?: string
@@ -12,6 +14,7 @@ type StatusSidebarProps = {
 
 export default function StatusSidebar({ className }: StatusSidebarProps) {
   const { sessions, activeSessionId, setActiveSessionId, createSession } = useChat()
+  const { theme } = useTheme()
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   // Draw the chat tree visualization
@@ -41,8 +44,11 @@ export default function StatusSidebar({ className }: StatusSidebarProps) {
     const nodeRadius = 25
     const activeNodeColor = "#3b82f6" // blue-500
     const inactiveNodeColor = "#9ca3af" // gray-400
-    const lineColor = "#d1d5db" // gray-300
+    const lineColor = document.documentElement.classList.contains('dark') ? "#4b5563" : "#d1d5db" // gray-600 in dark mode, gray-300 in light
     const lineWidth = 2
+
+    // Update canvas background to match theme
+    canvas.style.backgroundColor = document.documentElement.classList.contains('dark') ? "transparent" : "transparent"
 
     // Build tree structure
     type TreeNode = {
@@ -192,20 +198,22 @@ export default function StatusSidebar({ className }: StatusSidebarProps) {
       window.removeEventListener("resize", resizeCanvas)
       canvas.removeEventListener("click", handleCanvasClick)
     }
-  }, [sessions, activeSessionId, setActiveSessionId])
+  }, [sessions, activeSessionId, setActiveSessionId, theme])
 
   return (
     <div className={cn("flex flex-col h-full", className)}>
-      <div className="p-4 border-b border-gray-200 dark:border-gray-800">
-        <h2 className="text-xl font-bold">Chat Sessions</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">Visual chat tree</p>
+      <div className="p-4 border-b border-border">
+        <div className="flex justify-between items-center">
+          <h2 className="text-xl font-bold">Chat Tree</h2>
+          <ThemeToggle />
+        </div>
       </div>
 
       <div className="flex-1 relative">
         <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
       </div>
 
-      <div className="p-4 border-t border-gray-200 dark:border-gray-800">
+      <div className="p-4 border-t border-border">
         <Button
           variant="outline"
           className="w-full justify-start"
