@@ -4,6 +4,9 @@ import type { Message } from "@/components/chat-context"
 import { cn } from "@/lib/utils"
 import { Avatar } from "@/components/ui/avatar"
 import { CircleUser, Bot } from "lucide-react"
+import Markdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+
 
 type ChatMessageProps = {
   message: Message
@@ -31,12 +34,12 @@ export default function ChatMessage({ message }: ChatMessageProps) {
             <div className="h-4 w-24 bg-muted rounded animate-pulse"></div>
           </>
         ) : (
-          <p className="whitespace-pre-wrap">
-            {message.content}
+          <div className="whitespace-pre-wrap">
+            <Markdown remarkPlugins={[remarkGfm]}>{message.content}</Markdown>
             {message.isStreaming && (
-              <span className="inline-block animate-pulse ml-1">▋</span>
+              <span className="inline-block animate-pulse text-black dark:text-white ml-1">▋</span>
             )}
-          </p>
+          </div>
         )}
         <div className={cn("text-xs mt-1", isUser ? "text-primary-foreground/80" : "text-muted-foreground")}>
           {message.timestamp.toLocaleTimeString()}

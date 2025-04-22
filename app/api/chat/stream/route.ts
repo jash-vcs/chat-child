@@ -1,12 +1,12 @@
 import { NextRequest } from 'next/server';
-import { GoogleGenAI } from '@google/genai';
+import { ChatService } from '@/services/chat-service';
 
 export const runtime = 'edge';
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, config } = await req.json();
-    
+    const { messages, config, sessionId } = await req.json();
+
     // Validate request
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return new Response(JSON.stringify({ error: 'Invalid messages format' }), {
@@ -14,15 +14,22 @@ export async function POST(req: NextRequest) {
         headers: { 'Content-Type': 'application/json' },
       });
     }
-    
+
     if (!config || !config.model) {
       return new Response(JSON.stringify({ error: 'Invalid configuration' }), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
       });
     }
-    
-    // Initialize Google GenAI
+
+    if (!sessionId) {
+      return new Response(JSON.stringify({ error: 'Session ID is required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Initialize ChatService
     const apiKey = process.env.GOOGLE_API_KEY;
     if (!apiKey) {
       return new Response(JSON.stringify({ error: 'API key not configured' }), {
@@ -30,33 +37,18 @@ export async function POST(req: NextRequest) {
         headers: { 'Content-Type': 'application/json' },
       });
     }
-    
-    const ai = new GoogleGenAI({ apiKey });
-    
-    // Format messages for Google GenAI
-    const history = messages.slice(0, -1).map((msg: any) => ({
-      role: msg.role === 'assistant' ? 'model' : msg.role,
-      parts: [{ text: msg.content }],
-    }));
-    
+
+    const chatService = ChatService.getInstance(apiKey);
+
     // Get the latest message
     const latestMessage = messages[messages.length - 1];
-    
-    // Create chat instance
-    const chat = ai.chats.create({
-      model: config.model,
-      config:{
-        temperature: Number(config.temperature) || 0.7,
-        systemInstruction: config.systemInstruction,
-      },
-      history: history,
-    });
-    
+
+    // Get or create chat instance for this session
+    chatService.getChatInstance(sessionId, messages.slice(0, -1), config);
+
     // Create a streaming response
-    const stream = await chat.sendMessageStream({
-      message: latestMessage.content,
-    });
-    
+    const stream = await chatService.sendMessageStream(sessionId, latestMessage.content);
+
     // Set up the response stream
     const encoder = new TextEncoder();
     const readableStream = new ReadableStream({
@@ -74,7 +66,7 @@ export async function POST(req: NextRequest) {
         }
       },
     });
-    
+
     return new Response(readableStream, {
       headers: {
         'Content-Type': 'text/event-stream',

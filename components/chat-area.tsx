@@ -10,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Settings, Split, Send, GitBranch } from "lucide-react"
 import ChatMessage from "@/components/chat-message"
 import AgentConfigModal from "@/components/agent-config-modal"
-import { ThemeToggleSimple } from "@/components/theme-toggle"
+// import { ThemeToggleSimple } from "@/components/theme-toggle"
 
 type ChatAreaProps = {
   className?: string
@@ -54,7 +54,7 @@ export default function ChatArea({ className }: ChatAreaProps) {
     setInput("")
 
     // Add user message
-    const userMessageId = addMessage(activeSessionId, {
+    addMessage(activeSessionId, {
       content: userInput,
       role: "user",
     })
@@ -89,6 +89,7 @@ export default function ChatArea({ className }: ChatAreaProps) {
         },
         body: JSON.stringify({
           messages,
+          sessionId: activeSessionId, // Pass the session ID to reuse chat instance
           config: {
             model: activeSession.agentConfig.model,
             temperature: activeSession.agentConfig.temperature,
@@ -201,6 +202,7 @@ export default function ChatArea({ className }: ChatAreaProps) {
       <div className="p-4 border-t border-border">
         <form onSubmit={handleSubmit} className="flex space-x-2">
           <Input
+            autoFocus
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type your message..."
